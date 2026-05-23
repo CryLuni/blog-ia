@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuroPredict · Blog del Proyecto LSTM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Cursor glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- Animated background -->
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#hero" class="logo">
+      <span class="logo-icon">⟆</span>
+      <span class="logo-text">Neuro<span class="grad">Predict</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#datasets">Datasets</a></li>
+      <li><a href="#pipeline">Pipeline</a></li>
+      <li><a href="#models">Modelos</a></li>
+      <li><a href="#risks">Riesgos</a></li>
+      <li><a href="#team">Equipo</a></li>
+    </ul>
+    <button class="theme-btn" id="themeBtn" title="Cambiar tema">◐</button>
+  </div>
+</nav>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- HERO -->
+<header class="hero" id="hero">
+  <div class="hero-content">
+    <div class="badge fade-in">
+      <span class="dot"></span>
+      Universidad Mariano Gálvez · Inteligencia Artificial · 2026
+    </div>
+    <h1 class="hero-title">
+      <span class="line"><span class="word">Predicción</span></span>
+      <span class="line"><span class="word">de <span class="grad">Series Temporales</span></span></span>
+      <span class="line"><span class="word">con redes <span class="grad-2">LSTM</span></span></span>
+    </h1>
+    <p class="hero-sub fade-in delay-1">
+      Un sistema de aprendizaje profundo que aprende del pasado para anticipar el futuro:
+      consumo eléctrico minuto a minuto y actividad sísmica en Centroamérica.
+    </p>
+    <div class="hero-cta fade-in delay-2">
+      <a href="#intro" class="btn btn-primary">
+        Explorar el proyecto
+        <span class="arrow">→</span>
+      </a>
+      <a href="#models" class="btn btn-ghost">Ver resultados</a>
+    </div>
+
+    <div class="hero-stats fade-in delay-3">
+      <div class="stat">
+        <div class="stat-num" data-target="2075259">0</div>
+        <div class="stat-label">Mediciones eléctricas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="3730">0</div>
+        <div class="stat-label">Días de actividad sísmica</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-target="10">0</div>
+        <div class="stat-label">Riesgos identificados</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" data-suffix="%" data-target="98">0</div>
+        <div class="stat-label">Precisión modelo Energía</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</header>
+
+<!-- INTRO -->
+<section class="section" id="intro">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">01 · Introducción</span>
+      <h2>Aprender del tiempo</h2>
+      <p class="lead">
+        Las series de tiempo guardan patrones que un análisis aislado nunca revelaría.
+        Este proyecto explora cómo las redes <strong>LSTM (Long Short-Term Memory)</strong>
+        capturan dependencias a corto y largo plazo en dos dominios reales y muy distintos.
+      </p>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card reveal">
+        <div class="card-icon">⚡</div>
+        <h3>Consumo eléctrico</h3>
+        <p>Más de 2 millones de mediciones por minuto de un hogar en Sceaux, Francia, durante casi 4 años.</p>
+        <div class="card-tag">Serie continua</div>
+      </div>
+      <div class="card reveal" style="--delay:0.1s">
+        <div class="card-icon">🌋</div>
+        <h3>Actividad sísmica</h3>
+        <p>Eventos sísmicos de Centroamérica registrados por el USGS entre 2016 y 2026.</p>
+        <div class="card-tag">Serie de eventos</div>
+      </div>
+      <div class="card reveal" style="--delay:0.2s">
+        <div class="card-icon">🧠</div>
+        <h3>Redes LSTM</h3>
+        <p>Memoria interna controlada por puertas de olvido, entrada y salida para retener lo importante.</p>
+        <div class="card-tag">Deep Learning</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="section section-alt" id="problem">
+  <div class="container">
+    <div class="two-col">
+      <div class="reveal">
+        <span class="kicker">02 · Planteamiento</span>
+        <h2>El problema</h2>
+        <p class="lead">
+          Muchos sistemas tratan los datos como si fueran independientes y pierden la información
+          más valiosa: <em>el orden</em>. Predecir la demanda eléctrica o entender un patrón sísmico
+          exige modelar la dependencia temporal.
+        </p>
+        <ul class="check-list">
+          <li>Sobrecarga de la red eléctrica si la demanda no se anticipa.</li>
+          <li>Ausencia de patrones detectables en eventos sísmicos esporádicos.</li>
+          <li>Modelos clásicos que ignoran la secuencialidad.</li>
+        </ul>
+      </div>
+      <div class="reveal viz-card" style="--delay:0.15s">
+        <div class="viz-header">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="viz-title">time_series.py</span>
+        </div>
+        <pre class="code"><span class="c-key">import</span> torch.nn <span class="c-key">as</span> nn
+
+<span class="c-key">class</span> <span class="c-cls">LSTMModel</span>(nn.Module):
+    <span class="c-key">def</span> <span class="c-fn">__init__</span>(self, input_size, hidden_size):
+        <span class="c-key">super</span>().__init__()
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            batch_first=<span class="c-bool">True</span>
+        )
+        self.fc = nn.Linear(hidden_size, <span class="c-num">1</span>)
+
+    <span class="c-key">def</span> <span class="c-fn">forward</span>(self, x):
+        out, _ = self.lstm(x)
+        <span class="c-key">return</span> self.fc(out[:, -<span class="c-num">1</span>, :])</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATASETS -->
+<section class="section" id="datasets">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">03 · Datasets</span>
+      <h2>Dos mundos, una arquitectura</h2>
+      <p class="lead">
+        Comparar un fenómeno periódico con uno esporádico revela las fortalezas
+        y los límites reales de las redes recurrentes.
+      </p>
+    </div>
+
+    <div class="dataset-grid">
+      <article class="dataset-card reveal">
+        <div class="dataset-glow energy"></div>
+        <div class="dataset-head">
+          <span class="dataset-icon">⚡</span>
+          <h3>Consumo Eléctrico</h3>
+        </div>
+        <p class="dataset-desc">UCI · Individual household electric power consumption</p>
+        <div class="dataset-stats">
+          <div><strong>2,075,259</strong><span>registros</span></div>
+          <div><strong>47 meses</strong><span>periodo</span></div>
+          <div><strong>1 min</strong><span>frecuencia</span></div>
+          <div><strong>7</strong><span>variables</span></div>
+        </div>
+        <div class="vars">
+          <span>Global_active_power</span>
+          <span>Voltage</span>
+          <span>Global_intensity</span>
+          <span>Sub_metering_1/2/3</span>
+        </div>
+      </article>
+
+      <article class="dataset-card reveal" style="--delay:0.15s">
+        <div class="dataset-glow seismic"></div>
+        <div class="dataset-head">
+          <span class="dataset-icon">🌋</span>
+          <h3>Actividad Sísmica</h3>
+        </div>
+        <p class="dataset-desc">USGS · Centroamérica 2016 – 2026</p>
+        <div class="dataset-stats">
+          <div><strong>3,730</strong><span>días</span></div>
+          <div><strong>10 años</strong><span>periodo</span></div>
+          <div><strong>diaria</strong><span>frecuencia</span></div>
+          <div><strong>3</strong><span>variables</span></div>
+        </div>
+        <div class="vars">
+          <span>avg_mag</span>
+          <span>avg_depth</span>
+          <span>count_sismos</span>
+          <span>latitude / longitude</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section class="section section-alt" id="pipeline">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">04 · Pipeline</span>
+      <h2>Seis etapas, un solo flujo</h2>
+      <p class="lead">
+        De los datos crudos hasta el modelo entrenado: un pipeline limpio, modular
+        y reproducible.
+      </p>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h4>Limpieza</h4>
+          <p>Manejo de valores faltantes, normalización de tipos y filtrado por calidad.</p>
+          <code>limpiar_energia.py · limpiar_sismos.py</code>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h4>Preprocesamiento</h4>
+          <p>Agregación diaria de eventos sísmicos en una serie temporal regular.</p>
+          <code>preprocesar_sismos.py</code>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h4>Normalización</h4>
+          <p>Escalado MinMax de las variables y serialización del scaler para producción.</p>
+          <code>normalizar_*.py</code>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <h4>Ventanas deslizantes</h4>
+          <p>Conversión de la serie en problema supervisado con tensores 3D (X, y).</p>
+          <code>ventanas_*.py</code>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <h4>División temporal</h4>
+          <p>80% entrenamiento, 20% prueba — respetando el orden cronológico.</p>
+          <code>split_*.py</code>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">06</div>
+        <div class="step-body">
+          <h4>Entrenamiento</h4>
+          <p>Modelos LSTM en PyTorch con métricas RMSE, MAE y MAPE.</p>
+          <code>train_lstm_*.py</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELOS -->
+<section class="section" id="models">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">05 · Resultados</span>
+      <h2>Dos modelos, dos historias</h2>
+      <p class="lead">
+        El consumo eléctrico converge limpio. Los sismos, en cambio, exponen los retos
+        reales del aprendizaje sobre eventos esporádicos.
+      </p>
+    </div>
+
+    <div class="models">
+      <!-- ENERGY MODEL -->
+      <div class="model-card reveal">
+        <div class="model-header">
+          <span class="model-tag tag-good">Riesgo BAJO</span>
+          <h3>Modelo de Energía</h3>
+          <p>LSTM · 64 neuronas · ventana 60 · 7 features</p>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-bar"><div class="bar-fill good" data-fill="98"></div></div>
+            <div class="metric-row"><span>RMSE</span><strong>0.0180</strong></div>
+          </div>
+          <div class="metric">
+            <div class="metric-bar"><div class="bar-fill good" data-fill="99"></div></div>
+            <div class="metric-row"><span>MAE</span><strong>0.0069</strong></div>
+          </div>
+          <div class="metric">
+            <div class="metric-bar"><div class="bar-fill good" data-fill="44"></div></div>
+            <div class="metric-row"><span>Mejora de Loss</span><strong>44.6%</strong></div>
+          </div>
+        </div>
+        <div class="model-note good-note">
+          ✓ Convergencia limpia y sostenida. Captura patrones diarios y semanales del consumo.
+        </div>
+      </div>
+
+      <!-- SEISMIC MODEL -->
+      <div class="model-card reveal" style="--delay:0.15s">
+        <div class="model-header">
+          <span class="model-tag tag-bad">Riesgo ALTO</span>
+          <h3>Modelo Sísmico</h3>
+          <p>LSTM · 128 neuronas · ventana 7 · 3 features</p>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-bar"><div class="bar-fill bad" data-fill="76"></div></div>
+            <div class="metric-row"><span>RMSE</span><strong>0.2405</strong></div>
+          </div>
+          <div class="metric">
+            <div class="metric-bar"><div class="bar-fill bad" data-fill="81"></div></div>
+            <div class="metric-row"><span>MAE</span><strong>0.1862</strong></div>
+          </div>
+          <div class="metric">
+            <div class="metric-bar"><div class="bar-fill bad" data-fill="2"></div></div>
+            <div class="metric-row"><span>Mejora de Loss</span><strong>1.69%</strong></div>
+          </div>
+        </div>
+        <div class="model-note bad-note">
+          ⚠ Convergencia prematura. El modelo regresa a la media (~0.13) e ignora eventos reales.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RIESGOS -->
+<section class="section section-alt" id="risks">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">06 · Análisis de riesgos</span>
+      <h2>10 riesgos, 4 categorías</h2>
+      <p class="lead">
+        Cada riesgo está anclado en evidencia concreta del código y de los resultados.
+        Filtra por categoría para explorarlos.
+      </p>
+    </div>
+
+    <div class="filters reveal">
+      <button class="filter active" data-filter="all">Todos</button>
+      <button class="filter" data-filter="data">Datos</button>
+      <button class="filter" data-filter="model">Modelo</button>
+      <button class="filter" data-filter="design">Diseño</button>
+      <button class="filter" data-filter="ops">Operacional</button>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-card reveal" data-cat="data" data-level="critical">
+        <div class="risk-level">CRÍTICA</div>
+        <h4>Distribución desbalanceada</h4>
+        <p>Los días sin sismos quedan codificados como cero, sesgando la distribución.</p>
+        <span class="risk-tag">Datos · Sísmico</span>
+      </div>
+      <div class="risk-card reveal" data-cat="model" data-level="critical">
+        <div class="risk-level">CRÍTICA</div>
+        <h4>Regresión hacia la media</h4>
+        <p>El modelo aprende a predecir el promedio (~0.13) ignorando eventos reales.</p>
+        <span class="risk-tag">Modelo · Sísmico</span>
+      </div>
+      <div class="risk-card reveal" data-cat="data" data-level="high">
+        <div class="risk-level">ALTA</div>
+        <h4>Data leakage</h4>
+        <p>MinMaxScaler aplicado al dataset completo antes del split temporal.</p>
+        <span class="risk-tag">Datos · Energía</span>
+      </div>
+      <div class="risk-card reveal" data-cat="design" data-level="high">
+        <div class="risk-level">ALTA</div>
+        <h4>Sin conjunto de validación</h4>
+        <p>Imposible aplicar early stopping ni ajustar hiperparámetros con rigor.</p>
+        <span class="risk-tag">Diseño · Ambos</span>
+      </div>
+      <div class="risk-card reveal" data-cat="design" data-level="high">
+        <div class="risk-level">ALTA</div>
+        <h4>Ventana insuficiente</h4>
+        <p>7 días no alcanza para capturar precursores sísmicos.</p>
+        <span class="risk-tag">Diseño · Sísmico</span>
+      </div>
+      <div class="risk-card reveal" data-cat="model" data-level="medium">
+        <div class="risk-level">MEDIA</div>
+        <h4>Sin regularización</h4>
+        <p>No hay Dropout, weight decay ni Batch Normalization en el modelo.</p>
+        <span class="risk-tag">Modelo · Sísmico</span>
+      </div>
+      <div class="risk-card reveal" data-cat="model" data-level="medium">
+        <div class="risk-level">MEDIA</div>
+        <h4>Sobreajuste potencial</h4>
+        <p>Sin curva de validación no se confirma la generalización del modelo.</p>
+        <span class="risk-tag">Modelo · Energía</span>
+      </div>
+      <div class="risk-card reveal" data-cat="ops" data-level="medium">
+        <div class="risk-level">MEDIA</div>
+        <h4>Sin reproducibilidad</h4>
+        <p>No se fijan semillas aleatorias para PyTorch ni NumPy.</p>
+        <span class="risk-tag">Operacional · Ambos</span>
+      </div>
+      <div class="risk-card reveal" data-cat="ops" data-level="medium">
+        <div class="risk-level">MEDIA</div>
+        <h4>Modelo no guardado</h4>
+        <p>No se persiste con torch.save al finalizar el entrenamiento.</p>
+        <span class="risk-tag">Operacional · Ambos</span>
+      </div>
+      <div class="risk-card reveal" data-cat="ops" data-level="low">
+        <div class="risk-level">BAJA</div>
+        <h4>Carga computacional CPU</h4>
+        <p>64,850 pasos forward+backward sobre CPU saturan la RAM.</p>
+        <span class="risk-tag">Operacional · Energía</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARQUITECTURAS -->
+<section class="section" id="arch">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">07 · Arquitecturas</span>
+      <h2>Variantes de LSTM exploradas</h2>
+      <p class="lead">
+        Cada arquitectura aporta un compromiso distinto entre capacidad, costo y precisión.
+      </p>
+    </div>
+
+    <div class="arch-grid">
+      <div class="arch reveal">
+        <div class="arch-num">A</div>
+        <h4>LSTM Simple</h4>
+        <p>Una sola capa que procesa la secuencia. Modelo base, eficiente y fácil de entrenar.</p>
+        <ul>
+          <li>✓ Bajo costo</li>
+          <li>✗ Capacidad limitada</li>
+        </ul>
+      </div>
+      <div class="arch reveal" style="--delay:0.1s">
+        <div class="arch-num">B</div>
+        <h4>Stacked LSTM</h4>
+        <p>Múltiples capas apiladas que aprenden representaciones cada vez más profundas.</p>
+        <ul>
+          <li>✓ Patrones complejos</li>
+          <li>✗ Riesgo de sobreajuste</li>
+        </ul>
+      </div>
+      <div class="arch reveal" style="--delay:0.2s">
+        <div class="arch-num">C</div>
+        <h4>Bidirectional LSTM</h4>
+        <p>Procesa la secuencia en ambas direcciones para enriquecer el contexto.</p>
+        <ul>
+          <li>✓ Mayor contexto</li>
+          <li>✗ No apto para forecast</li>
+        </ul>
+      </div>
+      <div class="arch reveal" style="--delay:0.3s">
+        <div class="arch-num">D</div>
+        <h4>CNN-LSTM</h4>
+        <p>Combina convoluciones para extraer patrones locales con LSTM temporal.</p>
+        <ul>
+          <li>✓ Patrones híbridos</li>
+          <li>✗ Más hiperparámetros</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="section section-alt" id="team">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">08 · Equipo</span>
+      <h2>Las personas detrás del proyecto</h2>
+      <p class="lead">
+        Estudiantes de Ingeniería en Sistemas — Universidad Mariano Gálvez de Guatemala.
+        Catedrático: <strong>Ing. Jorge Luis Salguero Galicia</strong>.
+      </p>
+    </div>
+
+    <div class="team-grid">
+      <div class="member reveal"><div class="avatar">JA</div><h4>José Andrés López Flores</h4><span>3590-22-6856</span></div>
+      <div class="member reveal" style="--delay:0.05s"><div class="avatar">DR</div><h4>Dieter Randolfo Osorio Hernández</h4><span>3590-21-19249</span></div>
+      <div class="member reveal" style="--delay:0.10s"><div class="avatar">JV</div><h4>Jonathan Ananías Velasquez Martínez</h4><span>3590-22-2636</span></div>
+      <div class="member reveal" style="--delay:0.15s"><div class="avatar">DT</div><h4>Daylin Rebeca Temaj Pérez</h4><span>3590-22-17218</span></div>
+      <div class="member reveal" style="--delay:0.20s"><div class="avatar">KP</div><h4>Kateryn Yohana Pasán De León</h4><span>3590-22-9755</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-card reveal">
+      <h2>Del dato crudo a la <span class="grad">predicción</span></h2>
+      <p>
+        El pipeline de energía demostró ser técnicamente sólido. El sísmico, en cambio,
+        revela que el rendimiento de un modelo nace en las decisiones de diseño de los datos —
+        no solo en sus hiperparámetros.
+      </p>
+      <div class="cta-buttons">
+        <a href="#hero" class="btn btn-primary">Volver al inicio <span class="arrow">↑</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="logo">
+        <span class="logo-icon">⟆</span>
+        <span class="logo-text">Neuro<span class="grad">Predict</span></span>
+      </span>
+      <p>Universidad Mariano Gálvez · Inteligencia Artificial · Guatemala 2026</p>
+    </div>
+    <div class="footer-links">
+      <a href="#datasets">Datasets</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#models">Modelos</a>
+      <a href="#risks">Riesgos</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
