@@ -180,7 +180,7 @@ window.addEventListener('mousemove', (e) => {
 });
 
 // ============== Card 3D tilt ==============
-const tiltCards = document.querySelectorAll('.card, .dataset-card, .model-card, .arch, .member');
+const tiltCards = document.querySelectorAll('.card, .dataset-card, .model-card, .arch, .member, .video-card');
 tiltCards.forEach(card => {
   card.addEventListener('mousemove', (e) => {
     const rect = card.getBoundingClientRect();

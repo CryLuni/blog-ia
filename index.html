@@ -35,6 +35,7 @@
       <li><a href="#pipeline">Pipeline</a></li>
       <li><a href="#models">Modelos</a></li>
       <li><a href="#risks">Riesgos</a></li>
+      <li><a href="#video">Video</a></li>
       <li><a href="#team">Equipo</a></li>
     </ul>
     <button class="theme-btn" id="themeBtn" title="Cambiar tema">◐</button>
@@ -224,6 +225,8 @@
           <span>avg_mag</span>
           <span>avg_depth</span>
           <span>count_sismos</span>
+          <span>hay_actividad</span>
+          <span>max_mag</span>
           <span>latitude / longitude</span>
         </div>
       </article>
@@ -273,7 +276,7 @@
         <div class="step-num">04</div>
         <div class="step-body">
           <h4>Ventanas deslizantes</h4>
-          <p>Conversión de la serie en problema supervisado con tensores 3D (X, y).</p>
+          <p>Conversión de la serie en problema supervisado con tensores 3D (Energía: 48 horas, Sismología: 14 días).</p>
           <code>ventanas_*.py</code>
         </div>
       </div>
@@ -281,7 +284,7 @@
         <div class="step-num">05</div>
         <div class="step-body">
           <h4>División temporal</h4>
-          <p>80% entrenamiento, 20% prueba — respetando el orden cronológico.</p>
+          <p>70% entrenamiento, 15% validación, 15% prueba — respetando el orden cronológico para evitar sesgos.</p>
           <code>split_*.py</code>
         </div>
       </div>
@@ -339,26 +342,26 @@
       <!-- SEISMIC MODEL -->
       <div class="model-card reveal" style="--delay:0.15s">
         <div class="model-header">
-          <span class="model-tag tag-bad">Riesgo ALTO</span>
+          <span class="model-tag tag-good">Optimizado</span>
           <h3>Modelo Sísmico</h3>
-          <p>LSTM · 128 neuronas · ventana 7 · 3 features</p>
+          <p>LSTM · 128 neuronas · ventana 14 · 3 features</p>
         </div>
         <div class="metrics">
           <div class="metric">
-            <div class="metric-bar"><div class="bar-fill bad" data-fill="76"></div></div>
-            <div class="metric-row"><span>RMSE</span><strong>0.2405</strong></div>
+            <div class="metric-bar"><div class="bar-fill good" data-fill="94"></div></div>
+            <div class="metric-row"><span>RMSE</span><strong>0.0570</strong></div>
           </div>
           <div class="metric">
-            <div class="metric-bar"><div class="bar-fill bad" data-fill="81"></div></div>
-            <div class="metric-row"><span>MAE</span><strong>0.1862</strong></div>
+            <div class="metric-bar"><div class="bar-fill good" data-fill="97"></div></div>
+            <div class="metric-row"><span>MAE</span><strong>0.0279</strong></div>
           </div>
           <div class="metric">
-            <div class="metric-bar"><div class="bar-fill bad" data-fill="2"></div></div>
-            <div class="metric-row"><span>Mejora de Loss</span><strong>1.69%</strong></div>
+            <div class="metric-bar"><div class="bar-fill good" data-fill="92"></div></div>
+            <div class="metric-row"><span>MAPE</span><strong>7.66%</strong></div>
           </div>
         </div>
-        <div class="model-note bad-note">
-          ⚠ Convergencia prematura. El modelo regresa a la media (~0.13) e ignora eventos reales.
+        <div class="model-note good-note">
+          ✓ Mitigado mediante propagación de sismos y ventana de 14 días. Excelente convergencia y precisión.
         </div>
       </div>
     </div>
@@ -390,60 +393,70 @@
         <div class="risk-level">CRÍTICA</div>
         <h4>Distribución desbalanceada</h4>
         <p>Los días sin sismos quedan codificados como cero, sesgando la distribución.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Propagación estadística del día anterior e indicador binario de actividad.</div>
         <span class="risk-tag">Datos · Sísmico</span>
       </div>
       <div class="risk-card reveal" data-cat="model" data-level="critical">
         <div class="risk-level">CRÍTICA</div>
         <h4>Regresión hacia la media</h4>
         <p>El modelo aprende a predecir el promedio (~0.13) ignorando eventos reales.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Optimización de datos, aumento a 100+ épocas con early stopping y arquitectura de 14 días.</div>
         <span class="risk-tag">Modelo · Sísmico</span>
       </div>
       <div class="risk-card reveal" data-cat="data" data-level="high">
         <div class="risk-level">ALTA</div>
         <h4>Data leakage</h4>
         <p>MinMaxScaler aplicado al dataset completo antes del split temporal.</p>
+        <div class="risk-res"><strong>Resolución:</strong> MinMaxScaler ajustado exclusivamente en el conjunto de entrenamiento (X_train).</div>
         <span class="risk-tag">Datos · Energía</span>
       </div>
       <div class="risk-card reveal" data-cat="design" data-level="high">
         <div class="risk-level">ALTA</div>
         <h4>Sin conjunto de validación</h4>
         <p>Imposible aplicar early stopping ni ajustar hiperparámetros con rigor.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Implementado split temporal 70% entrenamiento / 15% validación / 15% prueba.</div>
         <span class="risk-tag">Diseño · Ambos</span>
       </div>
       <div class="risk-card reveal" data-cat="design" data-level="high">
         <div class="risk-level">ALTA</div>
         <h4>Ventana insuficiente</h4>
         <p>7 días no alcanza para capturar precursores sísmicos.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Ventana ampliada exitosamente de 7 a 14 días para capturar precursores sísmicos.</div>
         <span class="risk-tag">Diseño · Sísmico</span>
       </div>
       <div class="risk-card reveal" data-cat="model" data-level="medium">
         <div class="risk-level">MEDIA</div>
         <h4>Sin regularización</h4>
         <p>No hay Dropout, weight decay ni Batch Normalization en el modelo.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Integrado weight decay (1e-5) y ReduceLROnPlateau en optimizador Adam.</div>
         <span class="risk-tag">Modelo · Sísmico</span>
       </div>
       <div class="risk-card reveal" data-cat="model" data-level="medium">
         <div class="risk-level">MEDIA</div>
         <h4>Sobreajuste potencial</h4>
         <p>Sin curva de validación no se confirma la generalización del modelo.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Monitoreo activo de pérdidas de validación y aplicación de early stopping.</div>
         <span class="risk-tag">Modelo · Energía</span>
       </div>
       <div class="risk-card reveal" data-cat="ops" data-level="medium">
         <div class="risk-level">MEDIA</div>
         <h4>Sin reproducibilidad</h4>
         <p>No se fijan semillas aleatorias para PyTorch ni NumPy.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Establecidas semillas fijas en PyTorch y NumPy (manual_seed(42)).</div>
         <span class="risk-tag">Operacional · Ambos</span>
       </div>
       <div class="risk-card reveal" data-cat="ops" data-level="medium">
         <div class="risk-level">MEDIA</div>
         <h4>Modelo no guardado</h4>
         <p>No se persiste con torch.save al finalizar el entrenamiento.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Persistencia automática de pesos (.pth) y metadatos (.json) al terminar.</div>
         <span class="risk-tag">Operacional · Ambos</span>
       </div>
       <div class="risk-card reveal" data-cat="ops" data-level="low">
         <div class="risk-level">BAJA</div>
         <h4>Carga computacional CPU</h4>
         <p>64,850 pasos forward+backward sobre CPU saturan la RAM.</p>
+        <div class="risk-res"><strong>Resolución:</strong> Submuestreo de datos (1 de cada 4) y uso de memoria mapeada (mmap_mode).</div>
         <span class="risk-tag">Operacional · Energía</span>
       </div>
     </div>
@@ -502,11 +515,43 @@
   </div>
 </section>
 
-<!-- TEAM -->
-<section class="section section-alt" id="team">
+<!-- VIDEO DEMOSTRATIVO -->
+<section class="section section-alt" id="video">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker">08 · Equipo</span>
+      <span class="kicker">08 · Video Demostrativo</span>
+      <h2>Presentación del Proyecto</h2>
+      <p class="lead">
+        Conoce los detalles del pipeline de datos, el backend en Flask y la interfaz interactiva en React de primera mano mediante nuestra demostración en video.
+      </p>
+    </div>
+
+    <div class="reveal video-container-wrapper">
+      <div class="video-card">
+        <div class="video-ratio">
+          <iframe
+            src="https://drive.google.com/file/d/10OBr8XEDpac-U5KpUjKn7-8DsrK1aL7t/preview"
+            allow="autoplay; encrypted-media"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="video-meta">
+          <h4>Exposición Técnica de NeuroPredict</h4>
+          <p>Una caminata guiada por las fases de limpieza de datos, solución de data leakage, estructuración de las redes recurrentes y visualización en tiempo real del dashboard retro-artístico.</p>
+          <a href="https://drive.google.com/file/d/10OBr8XEDpac-U5KpUjKn7-8DsrK1aL7t/view?usp=sharing" target="_blank" class="btn btn-ghost btn-sm">
+            Ver en Google Drive ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="section" id="team">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">09 · Equipo</span>
       <h2>Las personas detrás del proyecto</h2>
       <p class="lead">
         Estudiantes de Ingeniería en Sistemas — Universidad Mariano Gálvez de Guatemala.
